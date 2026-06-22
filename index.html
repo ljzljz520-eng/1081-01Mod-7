@@ -326,6 +326,139 @@
             font-size: 0.9rem;
             line-height: 1.4;
         }
+
+        /* Family Panel */
+        .family-panel {
+            pointer-events: auto;
+            background: var(--glass-bg);
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            max-width: 220px;
+        }
+
+        .family-panel h3 {
+            color: var(--metallic-gold);
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+        }
+
+        .family-member {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.4rem 0;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            opacity: 0.6;
+        }
+
+        .family-member:hover {
+            opacity: 1;
+        }
+
+        .family-member.active {
+            opacity: 1;
+        }
+
+        .family-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .family-name {
+            font-size: 0.85rem;
+            flex: 1;
+        }
+
+        .family-toggle {
+            width: 30px;
+            height: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .family-member.active .family-toggle {
+            background: var(--metallic-gold);
+        }
+
+        .family-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .family-member.active .family-toggle::after {
+            transform: translateX(16px);
+        }
+
+        .share-mode-section {
+            margin-top: 1rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .share-mode-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .share-mode-btn.active {
+            background: var(--metallic-gold);
+            color: #000;
+            border-color: var(--metallic-gold);
+        }
+
+        .share-mode-btn:hover {
+            border-color: var(--metallic-gold);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: 2px solid;
+        }
+
+        .legend-dot.shared {
+            background: transparent;
+            border-style: double;
+        }
+
+        .legend-dot.private {
+            background: currentColor;
+        }
     </style>
     <!-- Import Maps for Three.js ES Modules -->
     <script type="importmap">
@@ -370,6 +503,47 @@
                     添加记忆节点
                 </button>
             </div>
+            <div class="family-panel" id="family-panel">
+                <h3>家族轨迹</h3>
+                <div class="family-member active" data-member="self">
+                    <div class="family-dot" style="background: #C5A059; color: #C5A059;"></div>
+                    <span class="family-name">我</span>
+                    <div class="family-toggle"></div>
+                </div>
+                <div class="family-member" data-member="father">
+                    <div class="family-dot" style="background: #4A90D9; color: #4A90D9;"></div>
+                    <span class="family-name">父亲</span>
+                    <div class="family-toggle"></div>
+                </div>
+                <div class="family-member" data-member="mother">
+                    <div class="family-dot" style="background: #E91E63; color: #E91E63;"></div>
+                    <span class="family-name">母亲</span>
+                    <div class="family-toggle"></div>
+                </div>
+                <div class="family-member" data-member="partner">
+                    <div class="family-dot" style="background: #9C27B0; color: #9C27B0;"></div>
+                    <span class="family-name">伴侣</span>
+                    <div class="family-toggle"></div>
+                </div>
+                <div class="family-member" data-member="child">
+                    <div class="family-dot" style="background: #00BCD4; color: #00BCD4;"></div>
+                    <span class="family-name">孩子</span>
+                    <div class="family-toggle"></div>
+                </div>
+                <div class="share-mode-section">
+                    <button class="share-mode-btn" id="share-mode-btn">
+                        📤 分享模式
+                    </button>
+                    <div class="legend-item">
+                        <span class="legend-dot shared" style="border-color: var(--metallic-gold);"></span>
+                        <span>共同事件</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot private" style="background: #888;"></span>
+                        <span>私密节点</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="footer">
@@ -398,6 +572,31 @@
             <h2 style="color: var(--metallic-gold); margin-bottom: 1.5rem; font-family: 'Cinzel';">铸造星辰</h2>
             <form id="event-form">
                 <div class="form-group">
+                    <label>所属成员</label>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer;">
+                            <input type="radio" name="event-member" value="self" checked>
+                            <span style="color: #C5A059;">我</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer;">
+                            <input type="radio" name="event-member" value="father">
+                            <span style="color: #4A90D9;">父亲</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer;">
+                            <input type="radio" name="event-member" value="mother">
+                            <span style="color: #E91E63;">母亲</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer;">
+                            <input type="radio" name="event-member" value="partner">
+                            <span style="color: #9C27B0;">伴侣</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.3rem; font-size: 0.85rem; cursor: pointer;">
+                            <input type="radio" name="event-member" value="child">
+                            <span style="color: #00BCD4;">孩子</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label>事件名称</label>
                     <input type="text" id="event-title" placeholder="例如：由你命名的瞬间" required>
                 </div>
@@ -413,6 +612,10 @@
                     <label>描述</label>
                     <textarea id="event-desc" rows="3" placeholder="这一刻发生了什么..."></textarea>
                 </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="event-shared" style="width: auto;">
+                    <label for="event-shared" style="display: inline; margin-bottom: 0; cursor: pointer;">设为共同事件（与我共享）</label>
+                </div>
                 <button type="submit" class="submit-btn" id="submit-btn">注入银河</button>
             </form>
         </div>
@@ -423,6 +626,7 @@
         <img class="event-media" id="card-img" style="display:none;">
         <!-- Removed empty src to prevent browser errors -->
         <video class="event-media" id="card-video" controls loop style="display:none;"></video>
+        <p class="event-date" id="card-member" style="color: var(--metallic-gold); font-size: 0.8rem; margin-bottom: 0.3rem; display: none;"></p>
         <h3 class="event-title" id="card-title">Event Title</h3>
         <p class="event-date" id="card-date">2023.01.01</p>
         <p class="event-desc" id="card-desc">Event description goes here.</p>
@@ -448,13 +652,23 @@
             }
         };
 
+        const FAMILY_MEMBERS = {
+            self: { name: '我', color: '#C5A059', offsetAngle: 0, offsetRadius: 0, lineWidth: 3.0 },
+            father: { name: '父亲', color: '#4A90D9', offsetAngle: -0.6, offsetRadius: 3.5, lineWidth: 2.2 },
+            mother: { name: '母亲', color: '#E91E63', offsetAngle: 0.6, offsetRadius: 3.5, lineWidth: 2.2 },
+            partner: { name: '伴侣', color: '#9C27B0', offsetAngle: -1.2, offsetRadius: 4.5, lineWidth: 2.2 },
+            child: { name: '孩子', color: '#00BCD4', offsetAngle: 1.2, offsetRadius: 4.5, lineWidth: 2.2 }
+        };
+
         const STATE = {
             isFlowing: true,
             speed: 0.2,
             targetSpeed: 0.2,
-            interactionMode: 'none', // none, rotate, zoom
+            interactionMode: 'none',
             events: [],
-            handPresent: false
+            handPresent: false,
+            shareMode: false,
+            activeMembers: { self: true, father: false, mother: false, partner: false, child: false }
         };
 
         // --- SCENE SETUP ---
@@ -601,68 +815,324 @@
 
         generateGalaxy();
 
-        // --- LIFE EVENTS (Special Particles) ---
+        // --- LIFE EVENTS & TRAJECTORIES ---
         const eventGroup = new THREE.Group();
         scene.add(eventGroup);
 
-        function addLifeEventToGalaxy(data, dominatColor) {
-            // Calculate a position on the outer edge or next "step" of the spiral
-            // For simplicity, we place them randomly on an imaginary timeline (radius)
-            // Ideally, time = radius distance from center.
+        const sharedConnectorGroup = new THREE.Group();
+        scene.add(sharedConnectorGroup);
 
-            const count = STATE.events.length;
-            const radius = 10 + (count * 5); // Growing outwards
-            const angle = count * 0.5; // Spiral out
+        const memberGroups = {
+            self: new THREE.Group(),
+            father: new THREE.Group(),
+            mother: new THREE.Group(),
+            partner: new THREE.Group(),
+            child: new THREE.Group()
+        };
+        Object.keys(memberGroups).forEach(memberId => {
+            const group = memberGroups[memberId];
+            group.visible = STATE.activeMembers[memberId];
+            eventGroup.add(group);
+        });
 
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
-            const y = (Math.random() - 0.5) * 5;
+        const trajectoryLines = {};
+        const trajectoryPoints = {
+            self: [],
+            father: [],
+            mother: [],
+            partner: [],
+            child: []
+        };
 
-            // Create a "Star" mesh - Increased Radius to 2.5
-            const starGeo = new THREE.SphereGeometry(2.5, 32, 32);
-            const starMat = new THREE.MeshBasicMaterial({
-                color: dominatColor || 0xFFFFFF,
+        function getEventPosition(eventIndex, memberId) {
+            const member = FAMILY_MEMBERS[memberId];
+            const radius = 10 + (eventIndex * 5);
+            const angle = eventIndex * 0.5;
+
+            const baseX = Math.cos(angle) * radius;
+            const baseZ = Math.sin(angle) * radius;
+
+            if (memberId === 'self') {
+                return { x: baseX, z: baseZ, radius, angle };
+            }
+
+            const perpAngle = angle + Math.PI / 2;
+            const offsetX = Math.cos(perpAngle) * member.offsetRadius;
+            const offsetZ = Math.sin(perpAngle) * member.offsetRadius;
+
+            return {
+                x: baseX + offsetX,
+                z: baseZ + offsetZ,
+                radius,
+                angle
+            };
+        }
+
+        function createTrajectoryLine(memberId) {
+            const member = FAMILY_MEMBERS[memberId];
+            const points = trajectoryPoints[memberId];
+
+            if (trajectoryLines[memberId]) {
+                memberGroups[memberId].remove(trajectoryLines[memberId]);
+                trajectoryLines[memberId].geometry.dispose();
+                trajectoryLines[memberId].material.dispose();
+            }
+
+            if (points.length < 2) return;
+
+            const curvePoints = points.map(p => new THREE.Vector3(p.x, p.y || 0, p.z));
+            const curve = new THREE.CatmullRomCurve3(curvePoints);
+            const tubeGeometry = new THREE.TubeGeometry(curve, points.length * 5, member.lineWidth * 0.15, 8, false);
+            const tubeMaterial = new THREE.MeshBasicMaterial({
+                color: member.color,
+                transparent: true,
+                opacity: 0.4,
                 toneMapped: false
             });
-            // toneMapped false lets it glow very bright with bloom
-            const star = new THREE.Mesh(starGeo, starMat);
-            star.position.set(x, y, z);
 
-            // Add a "Halo" Ring
-            const ringGeo = new THREE.RingGeometry(3.0, 3.2, 32);
+            const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
+            tube.userData = { isTrajectory: true, memberId };
+            trajectoryLines[memberId] = tube;
+            memberGroups[memberId].add(tube);
+        }
+
+        function createSharedConnector(sharedGroupId) {
+            const groupStars = [];
+            Object.keys(memberGroups).forEach(memberId => {
+                if (!STATE.activeMembers[memberId] && memberId !== 'self') return;
+                if (STATE.shareMode && memberId !== 'self') return;
+                memberGroups[memberId].children.forEach(star => {
+                    if (star.userData.data && star.userData.data.sharedGroupId === sharedGroupId && star.visible) {
+                        groupStars.push(star.position.clone());
+                    }
+                });
+            });
+
+            if (groupStars.length < 2) return null;
+
+            const connectorGroup = new THREE.Group();
+
+            for (let i = 0; i < groupStars.length; i++) {
+                for (let j = i + 1; j < groupStars.length; j++) {
+                    const start = groupStars[i].clone();
+                    const end = groupStars[j].clone();
+                    const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+                    mid.y += 5;
+
+                    const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+                    const tubeGeo = new THREE.TubeGeometry(curve, 30, 0.2, 8, false);
+                    const tubeMat = new THREE.MeshBasicMaterial({
+                        color: 0xFFFFFF,
+                        transparent: true,
+                        opacity: 0.7,
+                        toneMapped: false
+                    });
+                    const tube = new THREE.Mesh(tubeGeo, tubeMat);
+                    connectorGroup.add(tube);
+                }
+            }
+
+            connectorGroup.userData = { isSharedConnector: true, sharedGroupId };
+            return connectorGroup;
+        }
+
+        let sharedGroupCounter = 0;
+
+        function createEventStar(data, dominatColor, memberId, eventIndex, isShared, sharedWith, sharedGroupId) {
+            const member = FAMILY_MEMBERS[memberId];
+            const pos = getEventPosition(eventIndex, memberId);
+            const y = (Math.random() - 0.5) * 3;
+
+            const starSize = isShared ? 2.5 : 2.0;
+            const starGeo = new THREE.SphereGeometry(starSize, 32, 32);
+            const starColor = isShared ? 0xFFFFFF : (dominatColor || new THREE.Color(member.color));
+            const starMat = new THREE.MeshBasicMaterial({
+                color: starColor,
+                toneMapped: false
+            });
+            const star = new THREE.Mesh(starGeo, starMat);
+            star.position.set(pos.x, y, pos.z);
+
+            const ringOuter = isShared ? 3.2 : 2.6;
+            const ringInner = isShared ? 3.5 : 2.8;
+            const ringGeo = new THREE.RingGeometry(ringOuter, ringInner, 32);
             const ringMat = new THREE.MeshBasicMaterial({
-                color: dominatColor || 0xFFFFFF,
+                color: starColor,
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.6,
+                opacity: isShared ? 0.8 : 0.6,
                 toneMapped: false
             });
             const ring = new THREE.Mesh(ringGeo, ringMat);
-            ring.lookAt(0, 0, 0); // Face center roughly
+            ring.lookAt(0, 0, 0);
             star.add(ring);
 
-            // Add Light
-            const light = new THREE.PointLight(dominatColor || 0xFFFFFF, 5, 40);
-            light.position.set(x, y, z);
+            if (isShared) {
+                const innerRingGeo = new THREE.RingGeometry(1.8, 2.1, 32);
+                const innerRingMat = new THREE.MeshBasicMaterial({
+                    color: member.color,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.8,
+                    toneMapped: false
+                });
+                const innerRing = new THREE.Mesh(innerRingGeo, innerRingMat);
+                innerRing.lookAt(0, 0, 0);
+                star.add(innerRing);
+            }
+
+            const light = new THREE.PointLight(starColor, isShared ? 7 : 4, 40);
+            light.position.set(pos.x, y, pos.z);
             scene.add(light);
 
-            star.userData = { isEvent: true, data: data, ring: ring };
-            eventGroup.add(star);
+            const eventData = {
+                ...data,
+                memberId,
+                index: eventIndex,
+                isShared,
+                sharedWith,
+                sharedGroupId,
+                position: { x: pos.x, y, z: pos.z },
+                light
+            };
 
-            // Camera focus animation could go here
+            star.userData = { isEvent: true, data: eventData, ring, light };
+            memberGroups[memberId].add(star);
+
+            trajectoryPoints[memberId].push({ x: pos.x, y, z: pos.z });
+            createTrajectoryLine(memberId);
+
+            STATE.events.push(eventData);
+
             return star;
+        }
+
+        function addLifeEventToGalaxy(data, dominatColor, memberId = 'self', isShared = false, sharedWith = ['self']) {
+            if (isShared && sharedWith.length > 1) {
+                sharedGroupCounter++;
+                const groupId = sharedGroupCounter;
+
+                sharedWith.forEach(mId => {
+                    const memberEvents = STATE.events.filter(e => e.memberId === mId);
+                    const eventIndex = memberEvents.length;
+                    createEventStar(data, dominatColor, mId, eventIndex, true, sharedWith, groupId);
+                });
+
+                updateSharedConnectors();
+
+                return memberGroups[memberId].children[memberGroups[memberId].children.length - 1];
+            } else {
+                const memberEvents = STATE.events.filter(e => e.memberId === memberId);
+                const eventIndex = memberEvents.length;
+                return createEventStar(data, dominatColor, memberId, eventIndex, false, [memberId], null);
+            }
+        }
+
+        function updateSharedConnectors() {
+            while (sharedConnectorGroup.children.length > 0) {
+                const child = sharedConnectorGroup.children[0];
+                sharedConnectorGroup.remove(child);
+                child.traverse(obj => {
+                    if (obj.geometry) obj.geometry.dispose();
+                    if (obj.material) obj.material.dispose();
+                });
+            }
+
+            const groupIds = new Set();
+            STATE.events.forEach(e => {
+                if (e.isShared && e.sharedGroupId) {
+                    groupIds.add(e.sharedGroupId);
+                }
+            });
+
+            groupIds.forEach(groupId => {
+                const connector = createSharedConnector(groupId);
+                if (connector) {
+                    sharedConnectorGroup.add(connector);
+                }
+            });
+        }
+
+        function toggleMember(memberId) {
+            STATE.activeMembers[memberId] = !STATE.activeMembers[memberId];
+            const visible = STATE.activeMembers[memberId];
+
+            if (memberId === 'self') {
+                eventGroup.visible = visible;
+            } else {
+                memberGroups[memberId].visible = visible;
+            }
+
+            if (STATE.shareMode && memberId !== 'self' && visible) {
+                memberGroups[memberId].children.forEach(obj => {
+                    if (obj.userData.isEvent && obj.userData.data && !obj.userData.data.isShared) {
+                        obj.visible = false;
+                        if (obj.userData.light) obj.userData.light.visible = false;
+                    }
+                });
+            }
+
+            updateSharedConnectors();
+            updateLOD();
+        }
+
+        function toggleShareMode() {
+            STATE.shareMode = !STATE.shareMode;
+
+            if (STATE.shareMode) {
+                Object.keys(FAMILY_MEMBERS).forEach(memberId => {
+                    if (memberId !== 'self') {
+                        memberGroups[memberId].children.forEach(obj => {
+                            if (obj.userData.isEvent && obj.userData.data && !obj.userData.data.isShared) {
+                                obj.visible = false;
+                                if (obj.userData.light) obj.userData.light.visible = false;
+                            }
+                        });
+                        if (trajectoryLines[memberId]) {
+                            trajectoryLines[memberId].material.opacity = 0.15;
+                        }
+                    }
+                });
+            } else {
+                Object.keys(FAMILY_MEMBERS).forEach(memberId => {
+                    if (memberId !== 'self' && STATE.activeMembers[memberId]) {
+                        memberGroups[memberId].children.forEach(obj => {
+                            if (obj.userData.isEvent) {
+                                obj.visible = true;
+                                if (obj.userData.light) obj.userData.light.visible = true;
+                            }
+                        });
+                        if (trajectoryLines[memberId]) {
+                            trajectoryLines[memberId].material.opacity = 0.4;
+                        }
+                    }
+                });
+            }
+
+            updateSharedConnectors();
+            updateLOD();
         }
 
         // Raycasting for interactions
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
+        function getAllEventStars() {
+            const stars = [];
+            Object.values(memberGroups).forEach(group => {
+                group.children.forEach(obj => {
+                    if (obj.userData.isEvent && obj.visible) stars.push(obj);
+                });
+            });
+            return stars;
+        }
+
         window.addEventListener('click', (event) => {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(eventGroup.children);
+            const intersects = raycaster.intersectObjects(getAllEventStars());
 
             if (intersects.length > 0) {
                 const obj = intersects[0].object;
@@ -673,6 +1143,46 @@
                 hideEventCard();
             }
         });
+
+        function updateLOD() {
+            const cameraDistance = camera.position.length();
+
+            Object.keys(memberGroups).forEach(memberId => {
+                const group = memberGroups[memberId];
+                group.children.forEach(obj => {
+                    if (!obj.userData.isEvent) return;
+                    if (!obj.userData.baseScale) {
+                        obj.userData.baseScale = obj.scale.x || 1;
+                    }
+                    const lodScale = obj.userData.baseScale * (cameraDistance > 80 ? 1.8 : 1);
+                    obj.scale.set(lodScale, lodScale, lodScale);
+                });
+            });
+
+            Object.keys(trajectoryLines).forEach(memberId => {
+                const line = trajectoryLines[memberId];
+                if (line && line.material) {
+                    let baseOpacity = 0.4;
+                    if (STATE.shareMode && memberId !== 'self') {
+                        baseOpacity = 0.15;
+                    }
+                    if (cameraDistance > 100) {
+                        line.material.opacity = baseOpacity * 1.2;
+                    } else {
+                        line.material.opacity = baseOpacity;
+                    }
+                }
+            });
+
+            const hasActiveFamily = Object.keys(STATE.activeMembers).some(
+                m => m !== 'self' && STATE.activeMembers[m]
+            );
+            if (hasActiveFamily && cameraDistance > 60) {
+                points.material.uniforms.uSize.value = 40 * renderer.getPixelRatio();
+            } else {
+                points.material.uniforms.uSize.value = 70 * renderer.getPixelRatio();
+            }
+        }
 
         // --- MEDIAPIPE HANDS SETUP ---
         const videoElement = document.querySelector('.input_video');
@@ -785,26 +1295,30 @@
 
             const elapsedTime = clock.getElapsedTime();
 
-            // Update Shader uniforms
             material.uniforms.uTime.value = elapsedTime;
 
-            // Interpolate speed
             STATE.speed += (STATE.targetSpeed - STATE.speed) * 0.05;
 
-            // Rotate galaxy container if needed (besides orbit controls)
-            // But OrbitControls handles camera. 
-            // We can rotate the points mesh for "Flow"
             points.rotation.y += STATE.speed * 0.005;
+            eventGroup.rotation.y += STATE.speed * 0.005;
+            sharedConnectorGroup.rotation.y += STATE.speed * 0.005;
 
-            // Animate Events
-            eventGroup.children.forEach(star => {
-                const scale = 1 + Math.sin(elapsedTime * 2.0) * 0.1;
-                star.scale.set(scale, scale, scale);
-                if (star.userData.ring) {
-                    star.userData.ring.rotation.z += 0.01;
-                    star.userData.ring.rotation.x += 0.01;
-                }
+            Object.values(memberGroups).forEach(group => {
+                group.children.forEach(obj => {
+                    if (!obj.userData.isEvent) return;
+                    if (!obj.userData.baseScale) {
+                        obj.userData.baseScale = 1;
+                    }
+                    const breatheScale = obj.userData.baseScale * (1 + Math.sin(elapsedTime * 2.0 + obj.position.x) * 0.1);
+                    obj.scale.set(breatheScale, breatheScale, breatheScale);
+                    if (obj.userData.ring) {
+                        obj.userData.ring.rotation.z += 0.01;
+                        obj.userData.ring.rotation.x += 0.01;
+                    }
+                });
             });
+
+            updateLOD();
 
             controls.update();
             composer.render();
@@ -900,11 +1414,13 @@
             const date = document.getElementById('event-date').value;
             const desc = document.getElementById('event-desc').value;
             const fileInput = document.getElementById('event-file');
+            const memberId = document.querySelector('input[name="event-member"]:checked').value;
+            const isShared = document.getElementById('event-shared').checked;
+            const sharedWith = isShared ? ['self', memberId] : [memberId];
 
             if (fileInput.files && fileInput.files[0]) {
                 const file = fileInput.files[0];
                 const isVideo = file.type.startsWith('video');
-                // Use ObjectURL for better performance (especially for videos)
                 const mediaSrc = URL.createObjectURL(file);
 
                 const data = {
@@ -913,23 +1429,25 @@
                     src: mediaSrc
                 };
 
+                if (isShared && memberId !== 'self') {
+                    if (!STATE.activeMembers[memberId]) {
+                        toggleMember(memberId);
+                        document.querySelector(`.family-member[data-member="${memberId}"]`).classList.add('active');
+                    }
+                }
+
                 if (isVideo) {
-                    // For video, use a distinct Neon Cyan color to contrast
-                    addLifeEventToGalaxy(data, new THREE.Color('#00F0FF'));
-                    STATE.events.push(data);
+                    addLifeEventToGalaxy(data, new THREE.Color('#00F0FF'), memberId, isShared, sharedWith);
 
                     modal.classList.remove('active');
                     btn.innerText = "注入银河";
                     form.reset();
                 } else {
-                    // For image, we extract color
                     const img = new Image();
                     img.src = mediaSrc;
                     img.onload = () => {
                         const color = extractColor(img);
-
-                        addLifeEventToGalaxy(data, new THREE.Color(color));
-                        STATE.events.push(data);
+                        addLifeEventToGalaxy(data, new THREE.Color(color), memberId, isShared, sharedWith);
 
                         modal.classList.remove('active');
                         btn.innerText = "注入银河";
@@ -938,6 +1456,53 @@
                 }
             }
         });
+
+        document.querySelectorAll('.family-member').forEach(el => {
+            el.addEventListener('click', () => {
+                const memberId = el.dataset.member;
+                el.classList.toggle('active');
+                toggleMember(memberId);
+            });
+        });
+
+        document.getElementById('share-mode-btn').addEventListener('click', function() {
+            this.classList.toggle('active');
+            toggleShareMode();
+        });
+
+        function addDemoEvent(title, date, desc, memberId, isShared, sharedWith, color) {
+            const data = {
+                title,
+                date,
+                desc,
+                mediaType: 'image',
+                src: ''
+            };
+            addLifeEventToGalaxy(data, new THREE.Color(color || FAMILY_MEMBERS[memberId].color), memberId, isShared, sharedWith);
+        }
+
+        function initDemoData() {
+            addDemoEvent('出生', '1990-01-15', '来到这个世界的第一天', 'self', true, ['self', 'father', 'mother'], '#FFD700');
+            addDemoEvent('童年时光', '1995-06-20', '无忧无虑的童年记忆', 'self', false, ['self']);
+            addDemoEvent('毕业', '2012-07-01', '大学毕业典礼', 'self', false, ['self']);
+            addDemoEvent('相遇', '2015-03-10', '第一次遇见彼此的那天', 'self', true, ['self', 'partner'], '#FF69B4');
+            addDemoEvent('婚礼', '2018-09-20', '我们的结婚典礼', 'self', true, ['self', 'partner'], '#FF1493');
+            addDemoEvent('孩子出生', '2020-12-25', '新生命的到来', 'self', true, ['self', 'partner', 'child'], '#00CED1');
+            addDemoEvent('孩子生日', '2023-12-25', '三岁生日派对', 'child', false, ['child']);
+
+            addDemoEvent('父亲年轻时', '1965-05-10', '父亲年轻时候的照片', 'father', false, ['father']);
+            addDemoEvent('父亲工作', '1990-03-01', '父亲事业起步期', 'father', false, ['father']);
+
+            addDemoEvent('母亲年轻时', '1968-08-15', '母亲年轻时的风采', 'mother', false, ['mother']);
+            addDemoEvent('母亲生日', '2005-08-15', '母亲的生日聚会', 'mother', true, ['self', 'mother'], '#FF69B4');
+
+            addDemoEvent('伴侣童年', '1992-04-05', '伴侣的童年时光', 'partner', false, ['partner']);
+            addDemoEvent('伴侣旅行', '2014-07-01', '独自旅行的记忆', 'partner', false, ['partner']);
+
+            addDemoEvent('孩子第一步', '2021-11-10', '宝宝迈出人生第一步', 'child', true, ['self', 'partner', 'child'], '#7CFC00');
+        }
+
+        setTimeout(initDemoData, 1000);
 
         function showEventCard(data) {
             const card = document.getElementById('event-card');
@@ -948,19 +1513,39 @@
             document.getElementById('card-date').innerText = data.date;
             document.getElementById('card-desc').innerText = data.desc;
 
-            if (data.mediaType === 'image') {
+            const memberInfo = document.getElementById('card-member');
+            if (memberInfo && data.memberId) {
+                const member = FAMILY_MEMBERS[data.memberId];
+                let memberText = member.name;
+                if (data.isShared) {
+                    const sharedNames = data.sharedWith.map(id => FAMILY_MEMBERS[id].name).join('、');
+                    memberText += ' · 共享 (' + sharedNames + ')';
+                }
+                memberInfo.innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${member.color};margin-right:6px;"></span>${memberText}`;
+                memberInfo.style.display = 'block';
+            } else if (memberInfo) {
+                memberInfo.style.display = 'none';
+            }
+
+            const hasMedia = data.src && data.src.length > 0;
+
+            if (hasMedia && data.mediaType === 'image') {
                 img.src = data.src;
                 img.style.display = 'block';
                 vid.style.display = 'none';
                 vid.pause();
-                vid.src = ""; // Unload video
-            } else {
+                vid.src = "";
+            } else if (hasMedia && data.mediaType === 'video') {
                 img.style.display = 'none';
                 vid.src = data.src;
                 vid.style.display = 'block';
-                // Explicitly call load and play
                 vid.load();
                 vid.play().catch(e => console.warn("Auto-play blocked:", e));
+            } else {
+                img.style.display = 'none';
+                vid.style.display = 'none';
+                vid.pause();
+                vid.src = "";
             }
 
             card.classList.add('active');
